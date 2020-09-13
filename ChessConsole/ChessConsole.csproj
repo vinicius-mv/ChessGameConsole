@@ -43,11 +43,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BoardLayer\Board.cs" />
+    <Compile Include="BoardLayer\Color.cs" />
+    <Compile Include="BoardLayer\Piece.cs" />
+    <Compile Include="BoardLayer\Position.cs" />
+    <Compile Include="ChessLayer\King.cs" />
+    <Compile Include="ChessLayer\Rook.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Screen.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

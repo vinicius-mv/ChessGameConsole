@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using ChessConsole.BoardLayer;
 using ChessConsole.ChessLayer;
 
-namespace chess_system_console
+namespace ChessConsole
 {
-    internal class Program
+    public static class Program
     {
         private static void Main(string[] args)
         {

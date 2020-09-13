@@ -14,19 +14,13 @@ namespace chess_system_console
         {
             try
             {
-                var board = new Board(8, 8);
+                var chessPosition1 = new ChessPosition('A', 1);
 
-                board.PlacePiece(new Rook(board, Color.Black), new Position(0, 0));
+                var chessPosition2 = new ChessPosition('C', 7);
 
-                board.PlacePiece(new Rook(board, Color.Black), new Position(-1, 0));
+                Console.WriteLine(chessPosition1.ToPosition());
 
-                board.PlacePiece(new Rook(board, Color.Black), new Position(1, 3));
-
-                board.PlacePiece(new King(board, Color.Black), new Position(3, 4)); ;
-
-                Screen.PrintScreen(board);
-
-                Console.ReadLine();
+                Console.WriteLine(chessPosition2.ToPosition());
 
             }
             catch (Exception e)

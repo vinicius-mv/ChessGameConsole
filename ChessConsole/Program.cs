@@ -8,25 +8,23 @@ using ChessConsole.ChessLayer;
 
 namespace chess_system_console
 {
-    class Program
+    internal class Program
     {
-        internal class Program
+        private static void Main(string[] args)
         {
-            private static void Main(string[] args)
-            {
-                var board = new Board(8, 8);
+            var board = new Board(8, 8);
 
-                board.PlacePiece(new Rook(board, Color.Black), new Position(0, 0));
+            board.PlacePiece(new Rook(board, Color.Black), new Position(0, 0));
 
-                board.PlacePiece(new Rook(board, Color.Black), new Position(1, 3));
+            board.PlacePiece(new Rook(board, Color.Black), new Position(1, 3));
 
-                board.PlacePiece(new Rook(board, Color.Black), new Position(3, 4)); ;
+            board.PlacePiece(new King(board, Color.Black), new Position(3, 4)); ;
 
-                Screen.PrintScreen(board);
+            Screen.PrintScreen(board);
 
-                Console.ReadLine();
+            Console.ReadLine();
 
-            }
         }
     }
 }
+

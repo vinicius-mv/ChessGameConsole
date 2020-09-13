@@ -29,6 +29,10 @@ namespace ChessConsole.BoardLayer
 
         public void PlacePiece(Piece piece, Position position)
         {
+            if (IsThereAPiece(position))
+            {
+                throw new Exception("Position is already occupied.");
+            }
             _pieces[position.Row, position.Column] = piece;
             piece.Position = position;
         }
@@ -48,7 +52,7 @@ namespace ChessConsole.BoardLayer
         {
             if (!IsValidPosition(position))
             {
-                throw new BoardException("Invalid Position: out of the board.");
+                throw new BoardException("Invalid Position.");
             }
         }
     }

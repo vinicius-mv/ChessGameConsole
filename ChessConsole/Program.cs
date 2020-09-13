@@ -12,18 +12,28 @@ namespace chess_system_console
     {
         private static void Main(string[] args)
         {
-            var board = new Board(8, 8);
+            try
+            {
+                var board = new Board(8, 8);
 
-            board.PlacePiece(new Rook(board, Color.Black), new Position(0, 0));
+                board.PlacePiece(new Rook(board, Color.Black), new Position(0, 0));
 
-            board.PlacePiece(new Rook(board, Color.Black), new Position(1, 3));
+                board.PlacePiece(new Rook(board, Color.Black), new Position(-1, 0));
 
-            board.PlacePiece(new King(board, Color.Black), new Position(3, 4)); ;
+                board.PlacePiece(new Rook(board, Color.Black), new Position(1, 3));
 
-            Screen.PrintScreen(board);
+                board.PlacePiece(new King(board, Color.Black), new Position(3, 4)); ;
 
+                Screen.PrintScreen(board);
+
+                Console.ReadLine();
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
             Console.ReadLine();
-
         }
     }
 }

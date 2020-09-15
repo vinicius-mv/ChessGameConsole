@@ -17,6 +17,12 @@ namespace ChessConsole.BoardLayer
             Column = column;
         }
 
+        public void SetValuesPosition(int row, int column)
+        {
+            Row = row;
+            Column = column;
+        }
+
         public override string ToString()
         {
             return Row + ", " + Column;

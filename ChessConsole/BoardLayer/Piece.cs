@@ -15,9 +15,18 @@
             TotalMoves = 0;
         }
 
+        public abstract bool[,] PossibleMoves();
+
         public void IncrementMoves()
         {
             TotalMoves++;
+        }
+
+        protected bool CanMove(Position position)
+        {
+            Piece p = Board.GetPiece(position);
+
+            return (p == null) || (p.Color != Color);
         }
     }
 }

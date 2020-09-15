@@ -14,5 +14,10 @@
             Color = color;
             TotalMoves = 0;
         }
+
+        public void IncrementMoves()
+        {
+            TotalMoves++;
+        }
     }
 }

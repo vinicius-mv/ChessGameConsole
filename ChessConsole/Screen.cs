@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Runtime.InteropServices;
+using System.Reflection;
 using ChessConsole.BoardLayer;
+using ChessConsole.ChessLayer;
 
-namespace chess_system_console
+namespace ChessConsole
 {
     internal static class Screen
     {
@@ -34,12 +35,14 @@ namespace chess_system_console
 
             // print the botton header of the board
             Console.Write("  ");
-            for (var k = 0; k < board.Columns; k++)
+            for (var j = 0; j < board.Columns; j++)
             {
-                int letterInDecimal = 'a' + k;
+                int letterInDecimal = 'a' + j;
                 Console.Write((char)letterInDecimal);
                 Console.Write(" ");
             }
+
+            Console.WriteLine("\n");
         }
 
         public static void PrintPiece(Piece piece)
@@ -54,6 +57,25 @@ namespace chess_system_console
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write(piece);
             Console.ForegroundColor = originalColor;
+        }
+
+        public static ChessPosition ReadChessPosition()
+        {
+            try
+            {
+                string s = Console.ReadLine();
+
+                char column = s[0];
+
+                int row = int.Parse(s[1] + "");
+
+                return new ChessPosition(column, row);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error while executing [" + MethodBase.GetCurrentMethod().DeclaringType + " - " + MethodBase.GetCurrentMethod().Name + "]: " + e.Message);
+                return null;
+            }
         }
     }
 }

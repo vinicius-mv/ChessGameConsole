@@ -48,6 +48,7 @@
     <Compile Include="BoardLayer\Color.cs" />
     <Compile Include="BoardLayer\Piece.cs" />
     <Compile Include="BoardLayer\Position.cs" />
+    <Compile Include="ChessLayer\ChessMatch.cs" />
     <Compile Include="ChessLayer\ChessPosition.cs" />
     <Compile Include="ChessLayer\King.cs" />
     <Compile Include="ChessLayer\Rook.cs" />

@@ -43,6 +43,20 @@ namespace ChessConsole.BoardLayer
             return GetPiece(position) != null;
         }
 
+        public Piece RemovePiece(Position position)
+        {
+            if (GetPiece(position) == null)
+            {
+                return null;
+            }
+
+            Piece aux = GetPiece(position);
+            aux.Position = null;
+            _pieces[position.Row, position.Column] = null;
+
+            return aux;
+        }
+
         public bool IsValidPosition(Position position)
         {
             return position.Row <= Rows && position.Row >= 0 && position.Column <= Columns && position.Column >= 0;

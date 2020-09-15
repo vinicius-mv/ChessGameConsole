@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using chess_system_console;
 using ChessConsole.BoardLayer;
 using ChessConsole.ChessLayer;
 
@@ -15,19 +15,22 @@ namespace ChessConsole
         {
             try
             {
-                var board = new Board(8, 8);
+                var match = new ChessMatch();
 
-                board.PlacePiece(new Rook(board, Color.Black), new Position(0, 0) );
-                board.PlacePiece(new Rook(board, Color.Black), new Position(3,3) );
-                board.PlacePiece(new King(board, Color.Black), new Position(0, 2) );
+                while (!match.IsFinished)
+                {
+                    Console.Clear();
+                    Screen.PrintScreen(match.Board);
 
-                board.PlacePiece(new Rook(board, Color.White), new Position(7, 0 ));
-                board.PlacePiece(new Rook(board, Color.White), new Position(6, 7) );
+                    Console.Write("Origin: ");
+                    Position origin = Screen.ReadChessPosition().ToPosition();
 
+                    Console.Write("Destiny: ");
+                    Position destiny = Screen.ReadChessPosition().ToPosition();
 
-                Screen.PrintScreen(board);
-
-                Console.ReadKey();
+                    match.ExecuteMove(origin, destiny);
+                }
+                
             }
             catch (Exception e)
             {

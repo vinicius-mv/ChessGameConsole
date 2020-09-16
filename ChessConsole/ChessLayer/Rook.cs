@@ -28,9 +28,9 @@ namespace ChessConsole.ChessLayer
 
         public override bool[,] PossibleMoves()
         {
-            bool[,] mat = new bool[Board.Rows, Board.Columns];
+            var mat = new bool[Board.Rows, Board.Columns];
 
-            Position position = new Position(Position.Row, Position.Column);
+            var position = new Position(Position.Row, Position.Column);
 
             // check north positions
             position.SetValues(position.Row - 1, position.Column);
@@ -48,6 +48,7 @@ namespace ChessConsole.ChessLayer
             }
 
             // check south positions
+            position = new Position(Position.Row, Position.Column);
             position.SetValues(position.Row + 1, position.Column);
             while (Board.IsValidPosition(position) && CanMove(position))
             {
@@ -64,6 +65,7 @@ namespace ChessConsole.ChessLayer
             }
 
             //check east positions
+            position = new Position(Position.Row, Position.Column);
             position.SetValues(position.Row, position.Column + 1);
             while (Board.IsValidPosition(position) && CanMove(position))
             {
@@ -80,6 +82,7 @@ namespace ChessConsole.ChessLayer
             }
 
             // check west positions
+            position = new Position(Position.Row, Position.Column);
             position.SetValues(position.Row, position.Column - 1);
             while (Board.IsValidPosition(position) && CanMove(position))
             {

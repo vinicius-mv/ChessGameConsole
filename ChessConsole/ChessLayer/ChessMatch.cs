@@ -23,7 +23,7 @@ namespace ChessConsole.ChessLayer
             _actualPlayer = Color.White;
             IsFinished = false;
 
-            PlacePiecesAtStartPosition();
+            PlacePiecesStartPosition();
         }
 
         public void ExecuteMove(Position origin, Position destiny)
@@ -36,19 +36,19 @@ namespace ChessConsole.ChessLayer
             Board.PlacePiece(piece, destiny);
         }
 
-        private void PlacePiecesAtStartPosition()
+        private void PlacePiecesStartPosition()
         {
             Board.PlacePiece(new Rook(Board, Color.White), new ChessPosition('c', 1).ToPosition());
             Board.PlacePiece(new Rook(Board, Color.White), new ChessPosition('c', 2).ToPosition());
             Board.PlacePiece(new Rook(Board, Color.White), new ChessPosition('d', 2).ToPosition());
             Board.PlacePiece(new Rook(Board, Color.White), new ChessPosition('e', 2).ToPosition());
-            Board.PlacePiece(new Rook(Board, Color.White), new ChessPosition('e', 1).ToPosition());
+            // Board.PlacePiece(new Rook(Board, Color.White), new ChessPosition('e', 1).ToPosition());
             Board.PlacePiece(new King(Board, Color.White), new ChessPosition('d', 1).ToPosition());
 
             Board.PlacePiece(new Rook(Board, Color.Black), new ChessPosition('c', 7).ToPosition());
             Board.PlacePiece(new Rook(Board, Color.Black), new ChessPosition('c', 8).ToPosition());
             Board.PlacePiece(new Rook(Board, Color.Black), new ChessPosition('d', 7).ToPosition());
-            Board.PlacePiece(new Rook(Board, Color.Black), new ChessPosition('e', 7).ToPosition());
+            // Board.PlacePiece(new Rook(Board, Color.Black), new ChessPosition('e', 7).ToPosition());
             Board.PlacePiece(new Rook(Board, Color.Black), new ChessPosition('e', 8).ToPosition());
             Board.PlacePiece(new King(Board, Color.Black), new ChessPosition('d', 8).ToPosition());
         }

@@ -20,10 +20,15 @@ namespace ChessConsole
                 while (!match.IsFinished)
                 {
                     Console.Clear();
-                    Screen.PrintScreen(match.Board);
+                    Screen.PrintBoard(match.Board);
 
                     Console.Write("Origin: ");
                     Position origin = Screen.ReadChessPosition().ToPosition();
+
+                    bool[,] possibleMoves = match.Board.GetPiece(origin).PossibleMoves();
+
+                    Console.Clear();
+                    Screen.PrintBoard(match.Board, possibleMoves);
 
                     Console.Write("Destiny: ");
                     Position destiny = Screen.ReadChessPosition().ToPosition();

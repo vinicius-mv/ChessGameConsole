@@ -18,14 +18,22 @@ namespace ChessConsole.ChessLayer
             return "R";
         }
 
+
+        private bool CanMove(Position position)
+        {
+            Piece piece = Board.GetPiece(position);
+
+            return piece == null || piece.Color != Color;
+        }
+
         public override bool[,] PossibleMoves()
         {
-            bool[,] mat = new bool[Position.Row, Position.Column];
+            bool[,] mat = new bool[Board.Rows, Board.Columns];
 
-            Position position = new Position(0, 0);
+            Position position = new Position(Position.Row, Position.Column);
 
             // check north positions
-            position.SetValuesPosition(position.Row - 1, position.Column);
+            position.SetValues(position.Row - 1, position.Column);
             while (Board.IsValidPosition(position) && CanMove(position))
             {
                 mat[position.Row, position.Column] = true;
@@ -36,12 +44,11 @@ namespace ChessConsole.ChessLayer
                 {
                     break;
                 }
-
                 position.Row -= 1;
             }
 
             // check south positions
-            position.SetValuesPosition(position.Row + 1, position.Column);
+            position.SetValues(position.Row + 1, position.Column);
             while (Board.IsValidPosition(position) && CanMove(position))
             {
                 mat[position.Row, position.Column] = true;
@@ -57,7 +64,7 @@ namespace ChessConsole.ChessLayer
             }
 
             //check east positions
-            position.SetValuesPosition(position.Row, position.Column + 1);
+            position.SetValues(position.Row, position.Column + 1);
             while (Board.IsValidPosition(position) && CanMove(position))
             {
                 mat[position.Row, position.Column] = true;
@@ -73,7 +80,7 @@ namespace ChessConsole.ChessLayer
             }
 
             // check west positions
-            position.SetValuesPosition(position.Row, position.Column - 1);
+            position.SetValues(position.Row, position.Column - 1);
             while (Board.IsValidPosition(position) && CanMove(position))
             {
                 mat[position.Row, position.Column] = true;
@@ -87,6 +94,7 @@ namespace ChessConsole.ChessLayer
 
                 position.Column -= 1;
             }
+
             return mat;
         }
     }

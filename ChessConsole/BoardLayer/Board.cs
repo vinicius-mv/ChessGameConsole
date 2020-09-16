@@ -59,7 +59,7 @@ namespace ChessConsole.BoardLayer
 
         public bool IsValidPosition(Position position)
         {
-            return position.Row <= Rows && position.Row >= 0 && position.Column <= Columns && position.Column >= 0;
+            return position.Row < Rows && position.Row >= 0 && position.Column < Columns && position.Column >= 0;
         }
 
         public void ValidatePosition(Position position)

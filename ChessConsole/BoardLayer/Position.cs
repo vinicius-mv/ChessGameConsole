@@ -17,7 +17,7 @@ namespace ChessConsole.BoardLayer
             Column = column;
         }
 
-        public void SetValuesPosition(int row, int column)
+        public void SetValues(int row, int column)
         {
             Row = row;
             Column = column;

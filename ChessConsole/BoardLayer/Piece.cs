@@ -21,12 +21,5 @@
         {
             TotalMoves++;
         }
-
-        protected bool CanMove(Position position)
-        {
-            Piece p = Board.GetPiece(position);
-
-            return (p == null) || (p.Color != Color);
-        }
     }
 }

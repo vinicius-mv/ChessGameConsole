@@ -25,19 +25,19 @@ namespace ChessConsole.ChessLayer
             PlacePiecesStartPosition();
         }
 
-        public void ExecuteMove(Position origin, Position destiny)
+        public void ExecuteMove(Position origin, Position destination)
         {
             Piece piece = Board.RemovePiece(origin);
             piece.IncrementMoves();
 
-            Piece capturedPiece = Board.RemovePiece(destiny);
+            Piece capturedPiece = Board.RemovePiece(destination);
 
-            Board.PlacePiece(piece, destiny);
+            Board.PlacePiece(piece, destination);
         }
 
-        public void ExecutePlay(Position origin, Position destiny)
+        public void ExecutePlay(Position origin, Position destination)
         {
-            ExecuteMove(origin, destiny);
+            ExecuteMove(origin, destination);
             Turns++;
 
             ChangePlayerTurn();
@@ -64,6 +64,14 @@ namespace ChessConsole.ChessLayer
             if(!Board.GetPiece(position).IsThereAnyPossibleMove())
             {
                 throw new Exception("Invalid origin position: the piece selected has no possible moves!");
+            }
+        }
+
+        public void ValidateDestinationPosition(Position origin, Position destination)
+        {
+            if(!Board.GetPiece(origin).CanMoveTo(destination))
+            {
+                throw new BoardException("Invalid destinaion position.");
             }
         }
 

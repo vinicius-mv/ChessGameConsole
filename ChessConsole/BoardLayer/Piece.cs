@@ -37,5 +37,11 @@
             }
             return false;
         }
+
+        public bool CanMoveTo(Position position)
+        {
+            var possibleMoves = PossibleMoves();
+            return possibleMoves[position.Row, position.Column];
+        }
     }
 }

@@ -39,10 +39,11 @@ namespace ChessConsole
                         Screen.PrintBoard(match.Board, possibleMoves);
 
                         Console.WriteLine();
-                        Console.Write("Destiny: ");
-                        Position destiny = Screen.ReadChessPosition().ToPosition();
+                        Console.Write("Destination: ");
+                        Position destination = Screen.ReadChessPosition().ToPosition();
+                        match.ValidateDestinationPosition(origin, destination);
 
-                        match.ExecutePlay(origin, destiny);
+                        match.ExecutePlay(origin, destination);
                     }
                     catch (Exception ex)
                     {

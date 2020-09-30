@@ -19,23 +19,38 @@ namespace ChessConsole
 
                 while (!match.IsFinished)
                 {
-                    Console.Clear();
-                    Screen.PrintBoard(match.Board);
+                    try
+                    {
+                        Console.Clear();
+                        Screen.PrintBoard(match.Board);
 
-                    Console.Write("Origin: ");
-                    Position origin = Screen.ReadChessPosition().ToPosition();
+                        Console.WriteLine();
+                        Console.WriteLine("Turn: " + match.Turns);
+                        Console.WriteLine("Waiting player: " + match.ActualPlayer);
+                        Console.WriteLine();
 
-                    bool[,] possibleMoves = match.Board.GetPiece(origin).PossibleMoves();
+                        Console.Write("Origin: ");
+                        Position origin = Screen.ReadChessPosition().ToPosition();
+                        match.ValidateOriginPosition(origin);
 
-                    Console.Clear();
-                    Screen.PrintBoard(match.Board, possibleMoves);
+                        bool[,] possibleMoves = match.Board.GetPiece(origin).PossibleMoves();
 
-                    Console.Write("Destiny: ");
-                    Position destiny = Screen.ReadChessPosition().ToPosition();
+                        Console.Clear();
+                        Screen.PrintBoard(match.Board, possibleMoves);
 
-                    match.ExecuteMove(origin, destiny);
+                        Console.WriteLine();
+                        Console.Write("Destiny: ");
+                        Position destiny = Screen.ReadChessPosition().ToPosition();
+
+                        match.ExecutePlay(origin, destiny);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        Console.ReadKey();
+                    }
                 }
-                
+
             }
             catch (Exception e)
             {

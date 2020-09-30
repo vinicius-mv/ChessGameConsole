@@ -72,7 +72,7 @@ namespace ChessConsole
 
             // piece.Color == Black(Yellow)
             ConsoleColor originalColor = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.Write(piece + " ");
             Console.ForegroundColor = originalColor;
 

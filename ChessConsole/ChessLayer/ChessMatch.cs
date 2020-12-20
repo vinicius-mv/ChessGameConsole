@@ -12,7 +12,7 @@ namespace ChessConsole.ChessLayer
         public bool IsFinished { get; private set; }
         public int Turns { get; private set; }
         public Color ActualPlayer { get; private set; }
-        public bool IsCheckMate { get; private set; }
+        public bool IsCheck { get; private set; }
 
         private HashSet<Piece> _pieces;
         private HashSet<Piece> _capturedPieces;
@@ -26,7 +26,7 @@ namespace ChessConsole.ChessLayer
             Turns = 1;
             ActualPlayer = Color.White;
             IsFinished = false;
-            IsCheckMate = false;
+            IsCheck = false;
 
             PlacePiecesStartPosition();
         }
@@ -35,19 +35,19 @@ namespace ChessConsole.ChessLayer
         {
             Piece capturedPiece = ExecuteMove(origin, destination);
 
-            if (IsInCheckMateCondition(ActualPlayer))
+            if (IsInCheckCondition(ActualPlayer))
             {
                 RestoreMove(origin, destination, capturedPiece);
-                throw new BoardException("Invalid move: your king is in checkmate condition.");
+                throw new BoardException("Invalid move: your king is in check condition.");
             }
 
-            if (IsInCheckMateCondition(GetAdversaryColor(ActualPlayer)))
+            if (IsInCheckCondition(GetAdversaryColor(ActualPlayer)))
             {
-                IsCheckMate = true;
+                IsCheck = true;
             }
             else
             {
-                IsCheckMate = false;
+                IsCheck = false;
             }
 
             Turns++;
@@ -166,7 +166,7 @@ namespace ChessConsole.ChessLayer
             return null;
         }
 
-        public bool IsInCheckMateCondition(Color color)
+        public bool IsInCheckCondition(Color color)
         {
             var king = GetKing(color);
 

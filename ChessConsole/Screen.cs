@@ -34,9 +34,12 @@ namespace ChessConsole
 
             Console.WriteLine("Turn: " + match.Turns);
             Console.WriteLine($"Waiting player: {match.ActualPlayer}");
-            if(match.IsCheckMate)
+            if(match.IsCheck)
             {
-                Console.WriteLine("***** CHECK MATE *****");
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("CHECK !!!");
+                System.Console.ResetColor();
             }
             Console.WriteLine();
         }
@@ -49,10 +52,9 @@ namespace ChessConsole
             PrintSetPieces(match.GetCapturedPieces(Color.White));
 
             Console.Write("Black: ");
-            var defaultForegroundColor = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.DarkYellow;
             PrintSetPieces(match.GetCapturedPieces(Color.Black));
-            Console.ForegroundColor = defaultForegroundColor;
+            System.Console.ResetColor();
         }
 
         private static void PrintSetPieces(HashSet<Piece> pieces)
@@ -67,7 +69,6 @@ namespace ChessConsole
 
         public static void PrintBoard(Board board, bool[,] possibleMoves)
         {
-            ConsoleColor originalBackground = Console.BackgroundColor;
             const ConsoleColor highlightBackground = ConsoleColor.DarkGray; 
 
             for (var i = 0; i < board.Rows; i++)
@@ -82,14 +83,14 @@ namespace ChessConsole
                         Console.BackgroundColor = highlightBackground;
                     }
                     PrintPiece(board.GetPiece(i, j));
-                    Console.BackgroundColor = originalBackground;
+                    System.Console.ResetColor();
                 }
 
                 Console.WriteLine();
             }
             // print the footer of the board
             Console.WriteLine("  a b c d e f g h");
-            Console.BackgroundColor = originalBackground;
+            System.Console.ResetColor();
         }
 
         public static void PrintPiece(Piece piece)

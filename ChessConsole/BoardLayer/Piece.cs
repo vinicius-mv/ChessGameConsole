@@ -38,10 +38,9 @@
             return false;
         }
 
-        public bool CanMoveTo(Position position)
-        {
-            var possibleMoves = PossibleMoves();
-            return possibleMoves[position.Row, position.Column];
+        public bool CanMoveTo(Position pos)
+        { 
+            return PossibleMoves()[pos.Row, pos.Column];
         }
     }
 }

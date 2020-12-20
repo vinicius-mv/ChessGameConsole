@@ -30,10 +30,8 @@ namespace ChessConsole.ChessLayer
         {
             var mat = new bool[Board.Rows, Board.Columns];
 
-            var position = new Position(Position.Row, Position.Column);
-
             // check north positions
-            position.SetValues(position.Row - 1, position.Column);
+            var position = new Position(Position.Row - 1, Position.Column);
             while (Board.IsValidPosition(position) && CanMove(position))
             {
                 mat[position.Row, position.Column] = true;
@@ -48,8 +46,7 @@ namespace ChessConsole.ChessLayer
             }
 
             // check south positions
-            position = new Position(Position.Row, Position.Column);
-            position.SetValues(position.Row + 1, position.Column);
+            position = new Position(Position.Row + 1, Position.Column);
             while (Board.IsValidPosition(position) && CanMove(position))
             {
                 mat[position.Row, position.Column] = true;
@@ -65,8 +62,7 @@ namespace ChessConsole.ChessLayer
             }
 
             //check east positions
-            position = new Position(Position.Row, Position.Column);
-            position.SetValues(position.Row, position.Column + 1);
+            position = new Position(Position.Row, Position.Column + 1);
             while (Board.IsValidPosition(position) && CanMove(position))
             {
                 mat[position.Row, position.Column] = true;
@@ -82,8 +78,7 @@ namespace ChessConsole.ChessLayer
             }
 
             // check west positions
-            position = new Position(Position.Row, Position.Column);
-            position.SetValues(position.Row, position.Column - 1);
+            position = new Position(Position.Row, Position.Column - 1);
             while (Board.IsValidPosition(position) && CanMove(position))
             {
                 mat[position.Row, position.Column] = true;

@@ -42,11 +42,8 @@ namespace ChessConsole
                     {
                         Console.BackgroundColor = highlightBackground;
                     }
-                    else
-                    {
-                        Console.BackgroundColor = originalBackground;
-                    }
                     PrintPiece(board.GetPiece(i, j));
+                    Console.BackgroundColor = originalBackground;
                 }
 
                 Console.WriteLine();

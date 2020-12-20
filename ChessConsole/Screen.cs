@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using ChessConsole.BoardLayer;
 using ChessConsole.ChessLayer;
@@ -25,10 +26,45 @@ namespace ChessConsole
             Console.WriteLine("  a b c d e f g h");
         }
 
+        internal static void PrintMatch(ChessMatch match)
+        {
+            PrintBoard(match.Board);
+            Console.WriteLine();
+            PrintCapturedPieces(match);
+
+            Console.WriteLine("Turn: " + match.Turns);
+            Console.WriteLine($"Waiting player: {match.ActualPlayer}");
+            Console.WriteLine();
+        }
+
+        private static void PrintCapturedPieces(ChessMatch match)
+        {
+            Console.WriteLine("Captured pieces:");
+
+            Console.Write("White: ");
+            PrintSetPieces(match.GetCapturedPieces(Color.White));
+
+            Console.Write("Black: ");
+            var defaultForegroundColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            PrintSetPieces(match.GetCapturedPieces(Color.Black));
+            Console.ForegroundColor = defaultForegroundColor;
+        }
+
+        private static void PrintSetPieces(HashSet<Piece> pieces)
+        {
+            Console.Write("{ ");
+            foreach (var piece in pieces)
+            {
+                Console.Write($"{piece} ");
+            }
+            Console.Write("}");
+            Console.WriteLine();
+        }
+
         public static void PrintBoard(Board board, bool[,] possibleMoves)
         {
             ConsoleColor originalBackground = Console.BackgroundColor;
-
             const ConsoleColor highlightBackground = ConsoleColor.DarkGray; 
 
             for (var i = 0; i < board.Rows; i++)
@@ -81,9 +117,7 @@ namespace ChessConsole
             try
             {
                 string input = Console.ReadLine();
-
                 char column = input[0];
-
                 int row = int.Parse(input[1] + "");
 
                 return new ChessPosition(column, row);

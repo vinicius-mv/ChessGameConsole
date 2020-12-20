@@ -22,12 +22,7 @@ namespace ChessConsole
                     try
                     {
                         Console.Clear();
-                        Screen.PrintBoard(match.Board);
-
-                        Console.WriteLine();
-                        Console.WriteLine("Turn: " + match.Turns);
-                        Console.WriteLine("Waiting player: " + match.ActualPlayer);
-                        Console.WriteLine();
+                        Screen.PrintMatch(match);
 
                         Console.Write("Origin: ");
                         Position origin = Screen.ReadChessPosition().ToPosition();

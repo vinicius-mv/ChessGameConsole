@@ -17,9 +17,14 @@
 
         public abstract bool[,] PossibleMoves();
 
-        public void IncrementMoves()
+        public void IncrementTotalMoves()
         {
             TotalMoves++;
+        }
+
+        public void DecrementTotalMoves()
+        {
+            TotalMoves--;
         }
 
         public bool IsThereAnyPossibleMove()

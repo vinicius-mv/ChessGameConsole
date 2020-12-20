@@ -1,16 +1,18 @@
 ﻿using System;
 using ChessConsole.BoardLayer;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ChessConsole.ChessLayer
 {
     internal class ChessMatch
     {
-        
+
         public Board Board { get; private set; }
         public bool IsFinished { get; private set; }
         public int Turns { get; private set; }
         public Color ActualPlayer { get; private set; }
+        public bool IsCheckMate { get; private set; }
 
         private HashSet<Piece> _pieces;
         private HashSet<Piece> _capturedPieces;
@@ -24,29 +26,61 @@ namespace ChessConsole.ChessLayer
             Turns = 1;
             ActualPlayer = Color.White;
             IsFinished = false;
+            IsCheckMate = false;
 
             PlacePiecesStartPosition();
         }
 
         public void ExecutePlay(Position origin, Position destination)
         {
-            ExecuteMove(origin, destination);
-            Turns++;
+            Piece capturedPiece = ExecuteMove(origin, destination);
 
+            if (IsInCheckMateCondition(ActualPlayer))
+            {
+                RestoreMove(origin, destination, capturedPiece);
+                throw new BoardException("Invalid move: your king is in checkmate condition.");
+            }
+
+            if (IsInCheckMateCondition(GetAdversaryColor(ActualPlayer)))
+            {
+                IsCheckMate = true;
+            }
+            else
+            {
+                IsCheckMate = false;
+            }
+
+            Turns++;
             ChangePlayerTurn();
         }
 
-        public void ExecuteMove(Position origin, Position destination)
+        public Piece ExecuteMove(Position origin, Position destination)
         {
             Piece piece = Board.RemovePiece(origin);
-            piece.IncrementMoves();
+            piece.IncrementTotalMoves();
             Piece capturedPiece = Board.RemovePiece(destination);
-            Board.PlacePiece(piece, destination);
+            Board.PlacePiece(piece, destination); 
 
-            if(capturedPiece != null)
+            if (capturedPiece != null)
             {
-               _capturedPieces.Add(capturedPiece); 
+                _capturedPieces.Add(capturedPiece);
+                // _pieces.Remove(capturedPiece);
             }
+
+            return capturedPiece;
+        }
+
+        private void RestoreMove(Position origin, Position destination, Piece capturedPiece)
+        {
+            Piece piece = Board.RemovePiece(destination);
+            piece.DecrementTotalMoves();
+
+            if (capturedPiece != null)
+            {
+                Board.PlacePiece(capturedPiece, destination);
+                _capturedPieces.Remove(capturedPiece);
+            }
+            Board.PlacePiece(piece, origin);
         }
 
         private void ChangePlayerTurn()
@@ -67,7 +101,7 @@ namespace ChessConsole.ChessLayer
                 throw new Exception("Invalid origin position: the piece selected is not yours!");
             }
 
-            if(!Board.GetPiece(position).IsThereAnyPossibleMove())
+            if (!Board.GetPiece(position).IsThereAnyPossibleMove())
             {
                 throw new Exception("Invalid origin position: the piece selected has no possible moves!");
             }
@@ -75,7 +109,7 @@ namespace ChessConsole.ChessLayer
 
         public void ValidateDestinationPosition(Position origin, Position destination)
         {
-            if(!Board.GetPiece(origin).CanMoveTo(destination))
+            if (!Board.GetPiece(origin).CanMoveTo(destination))
             {
                 throw new BoardException("Invalid destination position.");
             }
@@ -86,7 +120,7 @@ namespace ChessConsole.ChessLayer
             var capturedPiecesFromColor = new HashSet<Piece>();
             foreach (var piece in _capturedPieces)
             {
-                if(piece.Color == color)
+                if (piece.Color == color)
                 {
                     capturedPiecesFromColor.Add(piece);
                 }
@@ -96,18 +130,67 @@ namespace ChessConsole.ChessLayer
 
         public HashSet<Piece> GetPiecesInGame(Color color)
         {
-            HashSet<Piece> piecesInGame = new HashSet<Piece>(_pieces);
+            HashSet<Piece> piecesInGame = new HashSet<Piece>();
 
-            foreach (var piece in piecesInGame)
+            foreach (var piece in _pieces)
             {
-                piecesInGame.Add(piece);
+                if(piece.Color == color)
+                {
+                    piecesInGame.Add(piece);
+                }
             }
+            
             piecesInGame.ExceptWith(GetCapturedPieces(color));
 
             return piecesInGame;
         }
 
-        public void PlaceNewPiece(char column, int row, Piece piece) 
+        private Color GetAdversaryColor(Color color)
+        {
+            if(color == Color.White)
+            {
+                return Color.Black;
+            }
+            return Color.White;
+        }
+
+        private Piece GetKing(Color color)
+        {
+            foreach (var piece in GetPiecesInGame(color))
+            {
+                if (piece is King)
+                {
+                    return piece;
+                }
+            }
+            return null;
+        }
+
+        public bool IsInCheckMateCondition(Color color)
+        {
+            var king = GetKing(color);
+
+            if (king == null)
+            {
+                throw new BoardException($"Invalid game state: Thre is no {color} king in the board.");
+            }
+
+            var pieces = GetPiecesInGame(GetAdversaryColor(color));
+
+
+            foreach (var piece in pieces)
+            {
+                bool[,] possibleMovesMat = piece.PossibleMoves();
+
+                if (possibleMovesMat[king.Position.Row, king.Position.Column])
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public void PlaceNewPiece(char column, int row, Piece piece)
         {
             Board.PlacePiece(piece, new ChessPosition(column, row).ToPosition());
             _pieces.Add(piece);
@@ -125,9 +208,9 @@ namespace ChessConsole.ChessLayer
             PlaceNewPiece('c', 7, new Rook(Board, Color.Black));
             PlaceNewPiece('c', 8, new Rook(Board, Color.Black));
             PlaceNewPiece('d', 7, new Rook(Board, Color.Black));
+            PlaceNewPiece('d', 8, new King(Board, Color.Black));
             PlaceNewPiece('e', 7, new Rook(Board, Color.Black));
             PlaceNewPiece('e', 8, new Rook(Board, Color.Black));
-            PlaceNewPiece('d', 8, new King(Board, Color.Black));
         }
     }
 }

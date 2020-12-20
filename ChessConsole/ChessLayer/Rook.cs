@@ -31,7 +31,8 @@ namespace ChessConsole.ChessLayer
             var mat = new bool[Board.Rows, Board.Columns];
 
             // check north positions
-            var position = new Position(Position.Row - 1, Position.Column);
+            var position = new Position(Position.Row, Position.Column);
+            position.SetValues(position.Row - 1, position.Column);
             while (Board.IsValidPosition(position) && CanMove(position))
             {
                 mat[position.Row, position.Column] = true;

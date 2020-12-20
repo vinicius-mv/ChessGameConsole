@@ -34,6 +34,10 @@ namespace ChessConsole
 
             Console.WriteLine("Turn: " + match.Turns);
             Console.WriteLine($"Waiting player: {match.ActualPlayer}");
+            if(match.IsCheckMate)
+            {
+                Console.WriteLine("***** CHECK MATE *****");
+            }
             Console.WriteLine();
         }
 
@@ -58,8 +62,7 @@ namespace ChessConsole
             {
                 Console.Write($"{piece} ");
             }
-            Console.Write("}");
-            Console.WriteLine();
+            Console.WriteLine("}");
         }
 
         public static void PrintBoard(Board board, bool[,] possibleMoves)

@@ -108,12 +108,9 @@ namespace ChessConsole
             }
 
             // piece.Color == Black(Yellow)
-            ConsoleColor originalColor = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.Write(piece + " ");
-            Console.ForegroundColor = originalColor;
-
-
+            System.Console.ResetColor();
         }
 
         public static ChessPosition ReadChessPosition()

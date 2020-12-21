@@ -9,7 +9,7 @@ namespace ChessConsole.ChessLayer
     {
 
         public Board Board { get; private set; }
-        public bool IsFinished { get; private set; }
+        public bool IsMatchCompleted { get; private set; }
         public int Turns { get; private set; }
         public Color ActualPlayer { get; private set; }
         public bool IsCheck { get; private set; }
@@ -25,7 +25,7 @@ namespace ChessConsole.ChessLayer
 
             Turns = 1;
             ActualPlayer = Color.White;
-            IsFinished = false;
+            IsMatchCompleted = false;
             IsCheck = false;
 
             PlacePiecesStartPosition();
@@ -35,20 +35,26 @@ namespace ChessConsole.ChessLayer
         {
             Piece capturedPiece = ExecuteMove(origin, destination);
 
-            if (IsInCheckCondition(ActualPlayer))
+            if (GetCheckCondition(ActualPlayer))
             {
                 RestoreMove(origin, destination, capturedPiece);
                 throw new BoardException("Invalid move: your king is in check condition.");
             }
 
-            if (IsInCheckCondition(GetAdversaryColor(ActualPlayer)))
+            if (GetCheckCondition(GetAdversaryColor(ActualPlayer)))
             {
                 IsCheck = true;
+
+                if (GetCheckMateCondition(GetAdversaryColor(ActualPlayer)))
+                {
+                    IsMatchCompleted = true;
+                }
             }
             else
             {
                 IsCheck = false;
             }
+
 
             Turns++;
             ChangePlayerTurn();
@@ -59,12 +65,12 @@ namespace ChessConsole.ChessLayer
             Piece piece = Board.RemovePiece(origin);
             piece.IncrementTotalMoves();
             Piece capturedPiece = Board.RemovePiece(destination);
-            Board.PlacePiece(piece, destination); 
+            Board.PlacePiece(piece, destination);
 
             if (capturedPiece != null)
             {
                 _capturedPieces.Add(capturedPiece);
-                // _pieces.Remove(capturedPiece);
+                _pieces.Remove(capturedPiece);
             }
 
             return capturedPiece;
@@ -134,12 +140,12 @@ namespace ChessConsole.ChessLayer
 
             foreach (var piece in _pieces)
             {
-                if(piece.Color == color)
+                if (piece.Color == color)
                 {
                     piecesInGame.Add(piece);
                 }
             }
-            
+
             piecesInGame.ExceptWith(GetCapturedPieces(color));
 
             return piecesInGame;
@@ -147,7 +153,7 @@ namespace ChessConsole.ChessLayer
 
         private Color GetAdversaryColor(Color color)
         {
-            if(color == Color.White)
+            if (color == Color.White)
             {
                 return Color.Black;
             }
@@ -166,7 +172,7 @@ namespace ChessConsole.ChessLayer
             return null;
         }
 
-        public bool IsInCheckCondition(Color color)
+        public bool GetCheckCondition(Color color)
         {
             var king = GetKing(color);
 
@@ -190,6 +196,35 @@ namespace ChessConsole.ChessLayer
             return false;
         }
 
+        public bool GetCheckMateCondition(Color color)
+        {
+            foreach (Piece piece in GetPiecesInGame(color))
+            {
+                bool[,] possibleMovesMat = piece.PossibleMoves();
+                for (int i = 0; i < Board.Rows; i++)
+                {
+                    for (int j = 0; j < Board.Columns; j++)
+                    {
+                        if (possibleMovesMat[i, j])
+                        {
+                            Position destination = new Position(i, j);
+
+                            // check if any possible move could escape check
+                            Piece capturedPiece = ExecuteMove(piece.Position, destination);
+                            bool testCheck = GetCheckCondition(color);
+                            RestoreMove(piece.Position, destination, capturedPiece);
+
+                            if (!testCheck)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
         public void PlaceNewPiece(char column, int row, Piece piece)
         {
             Board.PlacePiece(piece, new ChessPosition(column, row).ToPosition());
@@ -200,10 +235,10 @@ namespace ChessConsole.ChessLayer
         {
             PlaceNewPiece('c', 1, new Rook(Board, Color.White));
             PlaceNewPiece('c', 2, new Rook(Board, Color.White));
-            PlaceNewPiece('d', 2, new Rook(Board, Color.White));
-            PlaceNewPiece('e', 2, new Rook(Board, Color.White));
-            PlaceNewPiece('e', 1, new Rook(Board, Color.White));
             PlaceNewPiece('d', 1, new King(Board, Color.White));
+            PlaceNewPiece('d', 2, new Rook(Board, Color.White));
+            PlaceNewPiece('e', 1, new Rook(Board, Color.White));
+            PlaceNewPiece('e', 2, new Rook(Board, Color.White));
 
             PlaceNewPiece('c', 7, new Rook(Board, Color.Black));
             PlaceNewPiece('c', 8, new Rook(Board, Color.Black));

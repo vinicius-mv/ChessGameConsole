@@ -17,7 +17,7 @@ namespace ChessConsole
             {
                 var match = new ChessMatch();
 
-                while (!match.IsFinished)
+                while (!match.IsMatchCompleted)
                 {
                     try
                     {

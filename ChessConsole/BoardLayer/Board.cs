@@ -29,10 +29,6 @@ namespace ChessConsole.BoardLayer
 
         public void PlacePiece(Piece piece, Position position)
         {
-            if (IsThereAPiece(position))
-            {
-                throw new Exception("Position is already occupied.");
-            }
             _pieces[position.Row, position.Column] = piece;
             piece.Position = position;
         }
@@ -45,16 +41,17 @@ namespace ChessConsole.BoardLayer
 
         public Piece RemovePiece(Position position)
         {
-            if (GetPiece(position) == null)
+            Piece piece = GetPiece(position);
+
+            if (piece == null)
             {
                 return null;
             }
 
-            Piece aux = GetPiece(position);
-            aux.Position = null;
+            piece.Position = null;
             _pieces[position.Row, position.Column] = null;
 
-            return aux;
+            return piece;
         }
 
         public bool IsValidPosition(Position position)

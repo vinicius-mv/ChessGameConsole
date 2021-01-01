@@ -246,21 +246,28 @@ namespace ChessConsole.ChessLayer
 
         private void PlacePiecesStartPosition()
         {
+            PlaceNewPiece('a', 1, new Rook(Board, Color.White));
+            PlaceNewPiece('h', 1, new Rook(Board, Color.White));
+
+            PlaceNewPiece('b', 1, new Knight(Board, Color.White));
+            PlaceNewPiece('g', 1, new Knight(Board, Color.White));
+
             PlaceNewPiece('c', 1, new Bishop(Board, Color.White));
-            PlaceNewPiece('c', 2, new Rook(Board, Color.White));
-            PlaceNewPiece('d', 1, new King(Board, Color.White));
-            PlaceNewPiece('d', 2, new Rook(Board, Color.White));
-            PlaceNewPiece('e', 1, new Rook(Board, Color.White));
-            PlaceNewPiece('e', 2, new Rook(Board, Color.White));
             PlaceNewPiece('f', 1, new Bishop(Board, Color.White));
 
-            PlaceNewPiece('c', 7, new Rook(Board, Color.Black));
+            PlaceNewPiece('d', 1, new King(Board, Color.White));
+
+    
+            PlaceNewPiece('a', 8, new Rook(Board, Color.Black));
+            PlaceNewPiece('h', 8, new Rook(Board, Color.Black));
+
+            PlaceNewPiece('b', 8, new Knight(Board, Color.Black));
+            PlaceNewPiece('g', 8, new Knight(Board, Color.Black));
+
             PlaceNewPiece('c', 8, new Bishop(Board, Color.Black));
-            PlaceNewPiece('d', 7, new Rook(Board, Color.Black));
-            PlaceNewPiece('d', 8, new King(Board, Color.Black));
-            PlaceNewPiece('e', 7, new Rook(Board, Color.Black));
-            PlaceNewPiece('e', 8, new Rook(Board, Color.Black));
             PlaceNewPiece('f', 8, new Bishop(Board, Color.Black));
+
+            PlaceNewPiece('d', 8, new King(Board, Color.Black));
         }
     }
 }

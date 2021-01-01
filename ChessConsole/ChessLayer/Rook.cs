@@ -29,10 +29,10 @@ namespace ChessConsole.ChessLayer
         public override bool[,] PossibleMoves()
         {
             var possibleMovesMat = new bool[Board.Rows, Board.Columns];
+            var position = new Position(0, 0);
 
             // check N 
-            var position = new Position(Position.Row, Position.Column);
-            position.SetValues(position.Row - 1, position.Column);
+            position.SetValues(base.Position.Row - 1, base.Position.Column);
             while (Board.IsValidPosition(position) && CanMove(position))
             {
                 possibleMovesMat[position.Row, position.Column] = true;
@@ -47,7 +47,7 @@ namespace ChessConsole.ChessLayer
             }
 
             // check S 
-            position = new Position(Position.Row + 1, Position.Column);
+            position.SetValues(base.Position.Row + 1, base.Position.Column);
             while (Board.IsValidPosition(position) && CanMove(position))
             {
                 possibleMovesMat[position.Row, position.Column] = true;
@@ -63,7 +63,7 @@ namespace ChessConsole.ChessLayer
             }
 
             //check E 
-            position = new Position(Position.Row, Position.Column + 1);
+            position.SetValues(base.Position.Row, base.Position.Column + 1);
             while (Board.IsValidPosition(position) && CanMove(position))
             {
                 possibleMovesMat[position.Row, position.Column] = true;
@@ -79,7 +79,7 @@ namespace ChessConsole.ChessLayer
             }
 
             // check W 
-            position = new Position(Position.Row, Position.Column - 1);
+            position.SetValues(base.Position.Row, base.Position.Column - 1);
             while (Board.IsValidPosition(position) && CanMove(position))
             {
                 possibleMovesMat[position.Row, position.Column] = true;

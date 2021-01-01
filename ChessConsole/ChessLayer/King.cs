@@ -18,84 +18,84 @@ namespace ChessConsole.ChessLayer
             return "K";
         }
 
-        protected bool CanMove(Position position)
+        private bool CanMove(Position position)
         {
             Piece piece = Board.GetPiece(position);
 
-            return piece == null || piece.Color != Color;
+            return piece == null || piece.Color != base.Color;
         }
 
 
         public override bool[,] PossibleMoves()
         {
-            var mat = new bool[Board.Rows, Board.Columns];
+            var possibleMovesMat = new bool[Board.Rows, Board.Columns];
 
             var pos = new Position(Position.Row, Position.Column);
 
-            // check north
+            // check N
             pos = new Position(Position.Row, Position.Column);
             pos.SetValues(pos.Row - 1, pos.Column);
             if (Board.IsValidPosition(pos) && CanMove(pos))
             {
-                mat[pos.Row, pos.Column] = true;
+                possibleMovesMat[pos.Row, pos.Column] = true;
             }
 
-            // check south
+            // check S
             pos = new Position(Position.Row, Position.Column);
             pos.SetValues(pos.Row + 1, pos.Column);
             if (Board.IsValidPosition(pos) && CanMove(pos))
             {
-                mat[pos.Row, pos.Column] = true;
+                possibleMovesMat[pos.Row, pos.Column] = true;
             }
 
-            // check northeast
+            // check NE
             pos = new Position(Position.Row, Position.Column);
             pos.SetValues(pos.Row - 1, pos.Column + 1);
             if (Board.IsValidPosition(pos) && CanMove(pos))
             {
-                mat[pos.Row, pos.Column] = true;
+                possibleMovesMat[pos.Row, pos.Column] = true;
             }
 
-            // check southeast
+            // check SE
             pos = new Position(Position.Row, Position.Column);
             pos.SetValues(pos.Row + 1, pos.Column + 1);
             if (Board.IsValidPosition(pos) && CanMove(pos))
             {
-                mat[pos.Row, pos.Column] = true;
+                possibleMovesMat[pos.Row, pos.Column] = true;
             }
 
-            // check east 
+            // check E 
             pos = new Position(Position.Row, Position.Column);
             pos.SetValues(pos.Row, pos.Column + 1);
             if (Board.IsValidPosition(pos) && CanMove(pos))
             {
-                mat[pos.Row, pos.Column] = true;
+                possibleMovesMat[pos.Row, pos.Column] = true;
             }
 
-            // check northwest
+            // check NW
             pos = new Position(Position.Row, Position.Column);
             pos.SetValues(pos.Row - 1, pos.Column - 1);
             if (Board.IsValidPosition(pos) && CanMove(pos))
             {
-                mat[pos.Row, pos.Column] = true;
+                possibleMovesMat[pos.Row, pos.Column] = true;
             }
 
-            // check southwest
+            // check SW
             pos = new Position(Position.Row, Position.Column);
             pos.SetValues(pos.Row + 1, pos.Column - 1);
             if (Board.IsValidPosition(pos) && CanMove(pos))
             {
-                mat[pos.Row, pos.Column] = true;
+                possibleMovesMat[pos.Row, pos.Column] = true;
             }
 
-            // check west
+            // check W
             pos = new Position(Position.Row, Position.Column);
             pos.SetValues(pos.Row, pos.Column - 1);
             if (Board.IsValidPosition(pos) && CanMove(pos))
             {
-                mat[pos.Row, pos.Column] = true;
+                possibleMovesMat[pos.Row, pos.Column] = true;
             }
-            return mat;
+            return possibleMovesMat;
         }
     }
 }

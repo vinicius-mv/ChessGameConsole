@@ -23,19 +23,19 @@ namespace ChessConsole.ChessLayer
         {
             Piece piece = Board.GetPiece(position);
 
-            return piece == null || piece.Color != this.Color;
+            return piece == null || piece.Color != base.Color;
         }
 
         public override bool[,] PossibleMoves()
         {
-            var mat = new bool[Board.Rows, Board.Columns];
+            var possibleMovesMat = new bool[Board.Rows, Board.Columns];
 
-            // check north positions
+            // check N 
             var position = new Position(Position.Row, Position.Column);
             position.SetValues(position.Row - 1, position.Column);
             while (Board.IsValidPosition(position) && CanMove(position))
             {
-                mat[position.Row, position.Column] = true;
+                possibleMovesMat[position.Row, position.Column] = true;
 
                 var auxPiece = Board.GetPiece(position);
 
@@ -46,11 +46,11 @@ namespace ChessConsole.ChessLayer
                 position.Row -= 1;
             }
 
-            // check south positions
+            // check S 
             position = new Position(Position.Row + 1, Position.Column);
             while (Board.IsValidPosition(position) && CanMove(position))
             {
-                mat[position.Row, position.Column] = true;
+                possibleMovesMat[position.Row, position.Column] = true;
 
                 var auxPiece = Board.GetPiece(position);
 
@@ -62,11 +62,11 @@ namespace ChessConsole.ChessLayer
                 position.Row += 1;
             }
 
-            //check east positions
+            //check E 
             position = new Position(Position.Row, Position.Column + 1);
             while (Board.IsValidPosition(position) && CanMove(position))
             {
-                mat[position.Row, position.Column] = true;
+                possibleMovesMat[position.Row, position.Column] = true;
 
                 var auxPiece = Board.GetPiece(position);
 
@@ -78,11 +78,11 @@ namespace ChessConsole.ChessLayer
                 position.Column += 1;
             }
 
-            // check west positions
+            // check W 
             position = new Position(Position.Row, Position.Column - 1);
             while (Board.IsValidPosition(position) && CanMove(position))
             {
-                mat[position.Row, position.Column] = true;
+                possibleMovesMat[position.Row, position.Column] = true;
 
                 var auxPiece = Board.GetPiece(position);
 
@@ -94,7 +94,7 @@ namespace ChessConsole.ChessLayer
                 position.Column -= 1;
             }
 
-            return mat;
+            return possibleMovesMat;
         }
     }
 }

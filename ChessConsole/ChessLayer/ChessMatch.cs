@@ -2,6 +2,7 @@
 using ChessConsole.BoardLayer;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections.ObjectModel;
 
 namespace ChessConsole.ChessLayer
 {
@@ -14,12 +15,12 @@ namespace ChessConsole.ChessLayer
         public Color ActualPlayer { get; private set; }
         public bool IsCheck { get; private set; }
 
-        private HashSet<Piece> _pieces;
+        private readonly HashSet<Piece> _allPices;
         private HashSet<Piece> _capturedPieces;
 
         public ChessMatch()
         {
-            _pieces = new HashSet<Piece>();
+            _allPices = new HashSet<Piece>();
             _capturedPieces = new HashSet<Piece>();
             Board = new Board(8, 8);
 
@@ -35,27 +36,29 @@ namespace ChessConsole.ChessLayer
         {
             Piece capturedPiece = ExecuteMove(origin, destination);
 
+            // check if actual player didnt throw his own king in check condition
             if (GetCheckCondition(ActualPlayer))
             {
                 RestoreMove(origin, destination, capturedPiece);
                 throw new BoardException("Invalid move: your king is in check condition.");
             }
 
-            if (GetCheckCondition(GetAdversaryColor(ActualPlayer)))
+            // check if the opponent has any possible move to escape check (checkmate)
+            var opponentColor = GetOpponentColor(ActualPlayer);
+            if (GetCheckCondition(opponentColor))
             {
                 IsCheck = true;
 
-                if (GetCheckMateCondition(GetAdversaryColor(ActualPlayer)))
+                if (GetCheckMateCondition(opponentColor))
                 {
                     IsMatchCompleted = true;
+                    return;
                 }
             }
             else
             {
                 IsCheck = false;
             }
-
-
             Turns++;
             ChangePlayerTurn();
         }
@@ -70,7 +73,6 @@ namespace ChessConsole.ChessLayer
             if (capturedPiece != null)
             {
                 _capturedPieces.Add(capturedPiece);
-                _pieces.Remove(capturedPiece);
             }
 
             return capturedPiece;
@@ -97,6 +99,11 @@ namespace ChessConsole.ChessLayer
 
         public void ValidateOriginPosition(Position position)
         {
+            if(position == null)
+            {
+                throw new BoardException("Invalid position.");
+            }
+
             if (Board.GetPiece(position) == null)
             {
                 throw new BoardException("Invalid origin position: there is no piece at the position!");
@@ -115,13 +122,18 @@ namespace ChessConsole.ChessLayer
 
         public void ValidateDestinationPosition(Position origin, Position destination)
         {
+            if (destination == null)
+            {
+                throw new BoardException("Invalid position.");
+            }
+
             if (!Board.GetPiece(origin).CanMoveTo(destination))
             {
                 throw new BoardException("Invalid destination position.");
             }
         }
 
-        public HashSet<Piece> GetCapturedPieces(Color color)
+        public IEnumerable<Piece> GetCapturedPieces(Color color)
         {
             var capturedPiecesFromColor = new HashSet<Piece>();
             foreach (var piece in _capturedPieces)
@@ -134,24 +146,25 @@ namespace ChessConsole.ChessLayer
             return capturedPiecesFromColor;
         }
 
-        public HashSet<Piece> GetPiecesInGame(Color color)
+        public Collection<Piece> GetPiecesInGame(Color color)
         {
-            HashSet<Piece> piecesInGame = new HashSet<Piece>();
+            HashSet<Piece> piecesInGame = new HashSet<Piece>(_allPices);
+            piecesInGame.ExceptWith(GetCapturedPieces(color));
 
-            foreach (var piece in _pieces)
+            var finalListOfPices = new Collection<Piece>(piecesInGame.ToList());
+
+            foreach (var piece in piecesInGame)
             {
-                if (piece.Color == color)
+                if (piece.Color != color)
                 {
-                    piecesInGame.Add(piece);
+                    finalListOfPices.Remove(piece);
                 }
             }
 
-            piecesInGame.ExceptWith(GetCapturedPieces(color));
-
-            return piecesInGame;
+            return finalListOfPices;
         }
 
-        private Color GetAdversaryColor(Color color)
+        private Color GetOpponentColor(Color color)
         {
             if (color == Color.White)
             {
@@ -178,10 +191,10 @@ namespace ChessConsole.ChessLayer
 
             if (king == null)
             {
-                throw new BoardException($"Invalid game state: Thre is no {color} king in the board.");
+                throw new Exception($"Invalid game state: Thre is no {color} king in the board.");
             }
 
-            var pieces = GetPiecesInGame(GetAdversaryColor(color));
+            var pieces = GetPiecesInGame(GetOpponentColor(color)); 
 
 
             foreach (var piece in pieces)
@@ -208,13 +221,13 @@ namespace ChessConsole.ChessLayer
                         if (possibleMovesMat[i, j])
                         {
                             Position destination = new Position(i, j);
-
+                            Position origin = new Position(piece.Position.Row, piece.Position.Column);
                             // check if any possible move could escape check
-                            Piece capturedPiece = ExecuteMove(piece.Position, destination);
-                            bool testCheck = GetCheckCondition(color);
-                            RestoreMove(piece.Position, destination, capturedPiece);
+                            Piece capturedPiece = ExecuteMove(origin, destination);
+                            bool isCheck = GetCheckCondition(color);
+                            RestoreMove(origin, destination, capturedPiece);
 
-                            if (!testCheck)
+                            if (!isCheck) // there is a move that could escape check
                             {
                                 return false;
                             }
@@ -228,7 +241,7 @@ namespace ChessConsole.ChessLayer
         public void PlaceNewPiece(char column, int row, Piece piece)
         {
             Board.PlacePiece(piece, new ChessPosition(column, row).ToPosition());
-            _pieces.Add(piece);
+            _allPices.Add(piece);
         }
 
         private void PlacePiecesStartPosition()

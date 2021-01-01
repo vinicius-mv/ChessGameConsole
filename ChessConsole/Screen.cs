@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using ChessConsole.BoardLayer;
 using ChessConsole.ChessLayer;
+using ChessConsole.Utils;
 
 namespace ChessConsole
 {
@@ -12,35 +13,54 @@ namespace ChessConsole
         {
             for (var i = 0; i < board.Rows; i++)
             {
-                // print the left header of the board
-                Console.Write(8 - i + " ");
+                PrintBoardLeftHeader(i);
 
                 for (var j = 0; j < board.Columns; j++)
                 {
                     PrintPiece(board.GetPiece(i, j));
                 }
-
                 Console.WriteLine();
             }
             // print the bottom header of the board
-            Console.WriteLine("  a b c d e f g h");
+            PrintBoardFooter();
+        }
+
+        private static void PrintBoardFooter()
+        {
+            ConsoleExt.WriteLineColored("  a b c d e f g h", ConsoleColor.Cyan);
+        }
+
+        private static void PrintBoardLeftHeader(int i)
+        {
+            ConsoleExt.WriteColored(8 - i + " ", ConsoleColor.Cyan);
         }
 
         internal static void PrintMatch(ChessMatch match)
         {
             PrintBoard(match.Board);
             Console.WriteLine();
-            PrintCapturedPieces(match);
 
+            PrintCapturedPieces(match);
+            Console.WriteLine();
             Console.WriteLine("Turn: " + match.Turns);
-            Console.WriteLine($"Waiting player: {match.ActualPlayer}");
-            if(match.IsCheck)
+
+            if (!match.IsMatchCompleted)
             {
-                Console.WriteLine();
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine("CHECK !!!");
-                System.Console.ResetColor();
+                Console.WriteLine($"Waiting player: {match.ActualPlayer}");
+                if (match.IsCheck)
+                {
+                    ConsoleExt.WriteLineColored("CHECK!", ConsoleColor.Red);
+                }
             }
+            else 
+            {
+                ConsoleColor? color = match.ActualPlayer == Color.Black ? ConsoleColor.DarkYellow : Console.ForegroundColor;
+                ConsoleExt.WriteLineColored("CHECK MATE!", color);
+                ConsoleExt.WriteLineColored($"Player {match.ActualPlayer} Won! \n", color);
+                Console.WriteLine("Press any key to exit...");
+                Console.ReadLine();
+            }
+
             Console.WriteLine();
         }
 
@@ -49,32 +69,31 @@ namespace ChessConsole
             Console.WriteLine("Captured pieces:");
 
             Console.Write("White: ");
-            PrintSetPieces(match.GetCapturedPieces(Color.White));
+            var defaultColor = Console.ForegroundColor;
+            PrintSetPieces(match.GetCapturedPieces(Color.White), defaultColor);
 
             Console.Write("Black: ");
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            PrintSetPieces(match.GetCapturedPieces(Color.Black));
-            System.Console.ResetColor();
+            PrintSetPieces(match.GetCapturedPieces(Color.Black), ConsoleColor.DarkYellow);
+            Console.ResetColor();
         }
 
-        private static void PrintSetPieces(HashSet<Piece> pieces)
+        private static void PrintSetPieces(IEnumerable<Piece> pieces, ConsoleColor foregroundColor)
         {
-            Console.Write("{ ");
+            ConsoleExt.WriteColored("{ ", foregroundColor);
             foreach (var piece in pieces)
             {
-                Console.Write($"{piece} ");
+                ConsoleExt.WriteColored($"{piece} ", foregroundColor);
             }
-            Console.WriteLine("}");
+            ConsoleExt.WriteLineColored("}", foregroundColor);
         }
 
         public static void PrintBoard(Board board, bool[,] possibleMoves)
         {
-            const ConsoleColor highlightBackground = ConsoleColor.DarkGray; 
+            ConsoleColor highlightBackground = ConsoleColor.DarkGray;
 
             for (var i = 0; i < board.Rows; i++)
             {
-                // print the left header of the board
-                Console.Write(8 - i + " ");
+                PrintBoardLeftHeader(i);
 
                 for (var j = 0; j < board.Columns; j++)
                 {
@@ -83,14 +102,12 @@ namespace ChessConsole
                         Console.BackgroundColor = highlightBackground;
                     }
                     PrintPiece(board.GetPiece(i, j));
-                    System.Console.ResetColor();
+                    Console.ResetColor();
                 }
 
                 Console.WriteLine();
             }
-            // print the footer of the board
-            Console.WriteLine("  a b c d e f g h");
-            System.Console.ResetColor();
+            PrintBoardFooter();
         }
 
         public static void PrintPiece(Piece piece)
@@ -107,10 +124,7 @@ namespace ChessConsole
                 return;
             }
 
-            // piece.Color == Black(Yellow)
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.Write(piece + " ");
-            System.Console.ResetColor();
+            ConsoleExt.WriteColored(piece + " ", ConsoleColor.DarkYellow);
         }
 
         public static ChessPosition ReadChessPosition()
@@ -123,9 +137,9 @@ namespace ChessConsole
 
                 return new ChessPosition(column, row);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine("Error while executing [" + MethodBase.GetCurrentMethod().DeclaringType + " - " + MethodBase.GetCurrentMethod().Name + "]: " + e.Message);
+                Console.WriteLine("Error while executing [" + MethodBase.GetCurrentMethod().DeclaringType + " - " + MethodBase.GetCurrentMethod().Name + "]: " + ex.Message);
                 return null;
             }
         }

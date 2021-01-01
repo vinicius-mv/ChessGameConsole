@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ChessConsole.BoardLayer;
 using ChessConsole.ChessLayer;
+using ChessConsole.Utils;
 
 namespace ChessConsole
 {
@@ -25,7 +26,7 @@ namespace ChessConsole
                         Screen.PrintMatch(match);
 
                         Console.Write("Origin: ");
-                        Position origin = Screen.ReadChessPosition().ToPosition();
+                        Position origin = Screen.ReadChessPosition()?.ToPosition();
                         match.ValidateOriginPosition(origin);
 
                         bool[,] possibleMoves = match.Board.GetPiece(origin).PossibleMoves();
@@ -35,24 +36,24 @@ namespace ChessConsole
 
                         Console.WriteLine();
                         Console.Write("Destination: ");
-                        Position destination = Screen.ReadChessPosition().ToPosition();
+                        Position destination = Screen.ReadChessPosition()?.ToPosition();
                         match.ValidateDestinationPosition(origin, destination);
 
                         match.ExecutePlay(origin, destination);
                     }
-                    catch (Exception ex)
+                    catch (BoardException ex)
                     {
                         Console.WriteLine(ex.Message);
                         Console.ReadKey();
                     }
+                    Console.Clear();
+                    Screen.PrintMatch(match);
                 }
-
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
-            Console.ReadLine();
         }
     }
 }

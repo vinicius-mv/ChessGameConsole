@@ -23,7 +23,7 @@ namespace ChessConsole.ChessLayer
         {
             Piece piece = Board.GetPiece(position);
 
-            return piece == null || piece.Color != Color;
+            return piece == null || piece.Color != this.Color;
         }
 
         public override bool[,] PossibleMoves()

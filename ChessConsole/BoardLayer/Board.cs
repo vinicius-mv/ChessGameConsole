@@ -5,7 +5,7 @@ namespace ChessConsole.BoardLayer
 {
     class Board
     {
-        private Piece[,] _pieces;
+        private Piece[,] _piecesBoardControl;
 
         public int Rows { get; set; }
         public int Columns { get; set; }
@@ -14,28 +14,35 @@ namespace ChessConsole.BoardLayer
         {
             Rows = rows;
             Columns = columns;
-            _pieces = new Piece[rows, columns];
+            _piecesBoardControl = new Piece[rows, columns];
         }
 
         public Piece GetPiece(int row, int column)
         {
-            return _pieces[row, column];
+            return _piecesBoardControl[row, column];
         }
 
         public Piece GetPiece(Position position)
         {
-            return _pieces[position.Row, position.Column];
+            try
+            {
+                return _piecesBoardControl[position.Row, position.Column];
+            }
+            catch (IndexOutOfRangeException ex)
+            {
+                throw new BoardException("Invalid position: out of board position.");
+            }
         }
 
         public void PlacePiece(Piece piece, Position position)
         {
-            _pieces[position.Row, position.Column] = piece;
+            _piecesBoardControl[position.Row, position.Column] = piece;
             piece.Position = position;
         }
 
-        public bool IsThereAPiece(Position position) 
+        public bool IsThereAPiece(Position position)
         {
-            ValidatePosition(position); // throw exception if position is not valid
+            ValidatePosition(position);
             return GetPiece(position) != null;
         }
 
@@ -49,7 +56,7 @@ namespace ChessConsole.BoardLayer
             }
 
             piece.Position = null;
-            _pieces[position.Row, position.Column] = null;
+            _piecesBoardControl[position.Row, position.Column] = null;
 
             return piece;
         }

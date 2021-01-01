@@ -32,9 +32,9 @@
             bool[,] mat = PossibleMoves();
             for (int i = 0; i < Board.Rows; i++)
             {
-                for(int j = 0;  j < Board.Columns; j++)
+                for (int j = 0; j < Board.Columns; j++)
                 {
-                    if (mat[i,j])
+                    if (mat[i, j])
                     {
                         return true;
                     }
@@ -43,8 +43,8 @@
             return false;
         }
 
-        public bool CanMoveTo(Position pos)
-        { 
+        public bool PossibleMove(Position pos)
+        {
             return PossibleMoves()[pos.Row, pos.Column];
         }
     }

@@ -127,7 +127,7 @@ namespace ChessConsole.ChessLayer
                 throw new BoardException("Invalid position.");
             }
 
-            if (!Board.GetPiece(origin).CanMoveTo(destination))
+            if (!Board.GetPiece(origin).PossibleMove(destination))
             {
                 throw new BoardException("Invalid destination position.");
             }

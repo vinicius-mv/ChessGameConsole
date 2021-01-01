@@ -53,6 +53,7 @@
     <Compile Include="ChessLayer\ChessPosition.cs" />
     <Compile Include="ChessLayer\King.cs" />
     <Compile Include="ChessLayer\Knight.cs" />
+    <Compile Include="ChessLayer\Pawn.cs" />
     <Compile Include="ChessLayer\Queen.cs" />
     <Compile Include="ChessLayer\Rook.cs" />
     <Compile Include="Program.cs" />

@@ -40,7 +40,7 @@ namespace ChessConsole.ChessLayer
             if (GetCheckCondition(ActualPlayer))
             {
                 RestoreMove(origin, destination, capturedPiece);
-                throw new BoardException("Invalid move: your king is in check condition.");
+                throw new BoardException("Invalid move: can not let your own king in check condition.");
             }
 
             // check if the opponent has any possible move to escape check (checkmate)
@@ -111,12 +111,12 @@ namespace ChessConsole.ChessLayer
 
             if (ActualPlayer != Board.GetPiece(position).Color)
             {
-                throw new Exception("Invalid origin position: the piece selected is not yours!");
+                throw new BoardException("Invalid origin position: the piece selected is not yours!");
             }
 
             if (!Board.GetPiece(position).IsThereAnyPossibleMove())
             {
-                throw new Exception("Invalid origin position: the piece selected has no possible moves!");
+                throw new BoardException("Invalid origin position: the piece selected has no possible moves!");
             }
         }
 
@@ -256,8 +256,9 @@ namespace ChessConsole.ChessLayer
             PlaceNewPiece('f', 1, new Bishop(Board, Color.White));
 
             PlaceNewPiece('d', 1, new King(Board, Color.White));
+            PlaceNewPiece('e', 1, new Queen(Board, Color.White));
 
-    
+
             PlaceNewPiece('a', 8, new Rook(Board, Color.Black));
             PlaceNewPiece('h', 8, new Rook(Board, Color.Black));
 
@@ -268,6 +269,7 @@ namespace ChessConsole.ChessLayer
             PlaceNewPiece('f', 8, new Bishop(Board, Color.Black));
 
             PlaceNewPiece('d', 8, new King(Board, Color.Black));
+            PlaceNewPiece('e', 8, new Queen(Board, Color.Black));
         }
     }
 }

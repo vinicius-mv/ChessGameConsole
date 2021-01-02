@@ -14,6 +14,7 @@ namespace ChessConsole.ChessLayer
         public int Turns { get; private set; }
         public Color ActualPlayer { get; private set; }
         public bool IsCheck { get; private set; }
+        public Piece EnPassantVulnerable { get; private set; }
 
         private readonly HashSet<Piece> _allPices;
         private HashSet<Piece> _capturedPieces;
@@ -23,6 +24,7 @@ namespace ChessConsole.ChessLayer
             _allPices = new HashSet<Piece>();
             _capturedPieces = new HashSet<Piece>();
             Board = new Board(8, 8);
+            EnPassantVulnerable = null;
 
             Turns = 1;
             ActualPlayer = Color.White;
@@ -59,16 +61,32 @@ namespace ChessConsole.ChessLayer
             {
                 IsCheck = false;
             }
+
+            SetEnPassantVulnerablePiece(origin, destination);
+
             Turns++;
             ChangePlayerTurn();
         }
 
+        private void SetEnPassantVulnerablePiece(Position origin, Position destination)
+        {
+            var pieceDestination = Board.GetPiece(destination);
+            if (IsMoveEnPassantVulnerable(origin, destination, pieceDestination))
+            {
+                EnPassantVulnerable = pieceDestination;
+            }
+            else
+            {
+                EnPassantVulnerable = null;
+            }
+        }
+
         public Piece ExecuteMove(Position origin, Position destination)
         {
-            Piece piece = Board.RemovePiece(origin);
-            piece.IncrementTotalMoves();
+            Piece pieceOrigin = Board.RemovePiece(origin);
+            pieceOrigin.IncrementTotalMoves();
             Piece capturedPiece = Board.RemovePiece(destination);
-            Board.PlacePiece(piece, destination);
+            Board.PlacePiece(pieceOrigin, destination);
 
             if (capturedPiece != null)
             {
@@ -77,21 +95,40 @@ namespace ChessConsole.ChessLayer
 
             #region execute special move Castling
             // castling short 
-            if (IsCastlingShortMove(origin, destination, piece))
+            if (IsCastlingShortMove(origin, destination, pieceOrigin))
             {
-                ExecuteRookMoveCastlingShort(origin, destination, piece);
+                ExecuteRookMoveCastlingShort(origin, destination, pieceOrigin);
             }
 
             // castling long
-            if (IsCastlingLongMove(origin, destination, piece))
+            if (IsCastlingLongMove(origin, destination, pieceOrigin))
             {
-                ExecuteRookMoveCastlingLong(origin, destination, piece);
+                ExecuteRookMoveCastlingLong(origin, destination, pieceOrigin);
             }
 
+            // en passant
+            if (pieceOrigin is Pawn)
+            {
+                if (origin.Column != destination.Column && capturedPiece == null)
+                {
+                    Position positionCapturedPawn;
+                    if (pieceOrigin.Color == Color.White)
+                    {
+                        positionCapturedPawn = new Position(destination.Row + 1, destination.Column);
+                    }
+                    else
+                    {
+                        positionCapturedPawn = new Position(destination.Row - 1, destination.Column);
+                    }
+                    capturedPiece = Board.RemovePiece(positionCapturedPawn);
+                    _capturedPieces.Add(capturedPiece);
+                }
+            }
             #endregion
 
             return capturedPiece;
         }
+
 
         private void RestoreMove(Position origin, Position destination, Piece capturedPiece)
         {
@@ -117,22 +154,23 @@ namespace ChessConsole.ChessLayer
                 RestoreMoveLongCastling(piece, origin, destination);
             }
 
+            if (IsLastMoveEnPassant(origin, destination, capturedPiece, piece))
+            {
+                RestoreMoveEnPassant(origin, destination, capturedPiece, piece);
+            }
             #endregion
 
         }
 
-
-
-        private bool IsCastlingShortMove(Position origin, Position destination, Piece piece)
+        private static bool IsCastlingShortMove(Position origin, Position destination, Piece piece)
         {
             return piece is King && piece.TotalMoves == 1 && destination.Column == origin.Column + 2;
         }
 
-        private bool IsCastlingLongMove(Position origin, Position destination, Piece piece)
+        private static bool IsCastlingLongMove(Position origin, Position destination, Piece piece)
         {
             return piece is King && piece.TotalMoves == 1 && destination.Column == origin.Column - 2;
         }
-
 
         private void ExecuteRookMoveCastlingShort(Position origin, Position destination, Piece piece)
         {
@@ -143,7 +181,7 @@ namespace ChessConsole.ChessLayer
             Board.PlacePiece(rightRook, rookDestination);
         }
 
-        private bool IsLastMoveShortCastling(Piece piece, Position origin, Position destination)
+        private static bool IsLastMoveShortCastling(Piece piece, Position origin, Position destination)
         {
             return piece is King && piece.TotalMoves == 0 && destination.Column == origin.Column + 2;
         }
@@ -155,7 +193,7 @@ namespace ChessConsole.ChessLayer
             rightRook.DecrementTotalMoves();
             Board.PlacePiece(rightRook, rookOrigin);
         }
-        private bool IsLastMoveLongCastling(Piece piece, Position origin, Position destination)
+        private static bool IsLastMoveLongCastling(Piece piece, Position origin, Position destination)
         {
             return piece is King && piece.TotalMoves == 0 && destination.Column == origin.Column - 2;
         }
@@ -169,6 +207,26 @@ namespace ChessConsole.ChessLayer
             Board.PlacePiece(leftRook, rookOrigin);
         }
 
+        private bool IsLastMoveEnPassant(Position origin, Position destination, Piece capturedPiece, Piece piece)
+        {
+            return piece is Pawn && origin.Column != destination.Column && capturedPiece == EnPassantVulnerable;
+        }
+
+        private void RestoreMoveEnPassant(Position origin, Position destination, Piece capturedPiece, Piece piece)
+        {
+            Piece pawn = Board.RemovePiece(destination);
+            Position pawnOriginPositionBeforeEnPassant;
+            if(piece.Color == Color.White)
+            {
+                pawnOriginPositionBeforeEnPassant = new Position(3, destination.Column);
+            }
+            else
+            {
+                pawnOriginPositionBeforeEnPassant = new Position(4, destination.Column);
+            }
+            Board.PlacePiece(pawn, pawnOriginPositionBeforeEnPassant);
+        }
+
         private void ExecuteRookMoveCastlingLong(Position origin, Position destination, Piece piece)
         {
             Position rookOrigin = new Position(origin.Row, origin.Column - 4);
@@ -176,6 +234,11 @@ namespace ChessConsole.ChessLayer
             Piece leftRook = Board.RemovePiece(rookOrigin);
             leftRook.IncrementTotalMoves();
             Board.PlacePiece(leftRook, rookDestination);
+        }
+
+        private static bool IsMoveEnPassantVulnerable(Position origin, Position destination, Piece pieceDestination)
+        {
+            return pieceDestination is Pawn && (destination.Row == origin.Row + 2 || destination.Row == origin.Row - 2);
         }
 
         private void ChangePlayerTurn()
@@ -340,25 +403,25 @@ namespace ChessConsole.ChessLayer
             PlaceNewPiece('f', 1, new Bishop(Board, Color.White));
             PlaceNewPiece('g', 1, new Knight(Board, Color.White));
             PlaceNewPiece('h', 1, new Rook(Board, Color.White));
-
             PlaceNewPiece('h', 1, new Rook(Board, Color.White));
-            PlaceNewPiece('a', 2, new Pawn(Board, Color.White));
-            PlaceNewPiece('b', 2, new Pawn(Board, Color.White));
-            PlaceNewPiece('c', 2, new Pawn(Board, Color.White));
-            PlaceNewPiece('d', 2, new Pawn(Board, Color.White));
-            PlaceNewPiece('e', 2, new Pawn(Board, Color.White));
-            PlaceNewPiece('f', 2, new Pawn(Board, Color.White));
-            PlaceNewPiece('g', 2, new Pawn(Board, Color.White));
-            PlaceNewPiece('h', 2, new Pawn(Board, Color.White));
 
-            PlaceNewPiece('a', 7, new Pawn(Board, Color.Black));
-            PlaceNewPiece('b', 7, new Pawn(Board, Color.Black));
-            PlaceNewPiece('c', 7, new Pawn(Board, Color.Black));
-            PlaceNewPiece('d', 7, new Pawn(Board, Color.Black));
-            PlaceNewPiece('e', 7, new Pawn(Board, Color.Black));
-            PlaceNewPiece('f', 7, new Pawn(Board, Color.Black));
-            PlaceNewPiece('g', 7, new Pawn(Board, Color.Black));
-            PlaceNewPiece('h', 7, new Pawn(Board, Color.Black));
+            PlaceNewPiece('a', 2, new Pawn(Board, Color.White, this));
+            PlaceNewPiece('b', 2, new Pawn(Board, Color.White, this));
+            PlaceNewPiece('c', 2, new Pawn(Board, Color.White, this));
+            PlaceNewPiece('d', 2, new Pawn(Board, Color.White, this));
+            PlaceNewPiece('e', 2, new Pawn(Board, Color.White, this));
+            PlaceNewPiece('f', 2, new Pawn(Board, Color.White, this));
+            PlaceNewPiece('g', 2, new Pawn(Board, Color.White, this));
+            PlaceNewPiece('h', 2, new Pawn(Board, Color.White, this));
+
+            PlaceNewPiece('a', 7, new Pawn(Board, Color.Black, this));
+            PlaceNewPiece('b', 7, new Pawn(Board, Color.Black, this));
+            PlaceNewPiece('c', 7, new Pawn(Board, Color.Black, this));
+            PlaceNewPiece('d', 7, new Pawn(Board, Color.Black, this));
+            PlaceNewPiece('e', 7, new Pawn(Board, Color.Black, this));
+            PlaceNewPiece('f', 7, new Pawn(Board, Color.Black, this));
+            PlaceNewPiece('g', 7, new Pawn(Board, Color.Black, this));
+            PlaceNewPiece('h', 7, new Pawn(Board, Color.Black, this));
 
             PlaceNewPiece('a', 8, new Rook(Board, Color.Black));
             PlaceNewPiece('b', 8, new Knight(Board, Color.Black));

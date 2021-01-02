@@ -9,8 +9,11 @@ namespace ChessConsole.ChessLayer
 {
     internal class Pawn : Piece
     {
-        public Pawn(Board board, Color color) : base(board, color)
+        private ChessMatch _match;
+
+        public Pawn(Board board, Color color, ChessMatch match) : base(board, color)
         {
+            _match = match;
         }
 
         public override string ToString()
@@ -52,14 +55,14 @@ namespace ChessConsole.ChessLayer
 
             // check double move 'forward' (only first move)
             position.SetValues(base.Position.Row + 2 * signal, base.Position.Column);
-            if(Board.IsValidPosition(position) && IsFree(position) && base.TotalMoves == 0)
+            if (Board.IsValidPosition(position) && IsFree(position) && base.TotalMoves == 0)
             {
                 possibleMovesMat[position.Row, position.Column] = true;
             }
 
             // check left diagonal move (attack opponent)
             position.SetValues(base.Position.Row + 1 * signal, base.Position.Column - 1);
-            if(Board.IsValidPosition(position) && IsThereAnEnemy(position))
+            if (Board.IsValidPosition(position) && IsThereAnEnemy(position))
             {
                 possibleMovesMat[position.Row, position.Column] = true;
             }
@@ -71,6 +74,22 @@ namespace ChessConsole.ChessLayer
                 possibleMovesMat[position.Row, position.Column] = true;
             }
 
+            // check en passant
+            position.SetValues(base.Position.Row, base.Position.Column);
+            if (position.Row == 3 || position.Row == 4)
+            {
+                Position leftPosition = new Position(position.Row, position.Column - 1);
+                if (Board.IsValidPosition(leftPosition) && IsThereAnEnemy(leftPosition) && Board.GetPiece(leftPosition) == _match.EnPassantVulnerable)
+                {
+                    possibleMovesMat[leftPosition.Row + 1 * signal, leftPosition.Column] = true;
+                }
+
+                Position rightPosition = new Position(position.Row, position.Column + 1);
+                if (Board.IsValidPosition(rightPosition) && IsThereAnEnemy(rightPosition) && Board.GetPiece(rightPosition) == _match.EnPassantVulnerable)
+                {
+                    possibleMovesMat[rightPosition.Row + 1 * signal, rightPosition.Column] = true;
+                }
+            }
             return possibleMovesMat;
         }
     }

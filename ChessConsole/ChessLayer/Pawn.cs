@@ -55,7 +55,7 @@ namespace ChessConsole.ChessLayer
 
             // check double move 'forward' (only first move)
             position.SetValues(base.Position.Row + 2 * signal, base.Position.Column);
-            if (Board.IsValidPosition(position) && IsFree(position) && base.TotalMoves == 0)
+            if (base.TotalMoves == 0 && Board.IsValidPosition(position) && IsFree(position) && possibleMovesMat[position.Row - 1 * signal, position.Column])
             {
                 possibleMovesMat[position.Row, position.Column] = true;
             }

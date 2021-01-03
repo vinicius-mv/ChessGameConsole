@@ -16,7 +16,7 @@ namespace ChessConsole.ChessLayer
         public bool IsCheck { get; private set; }
         public Piece EnPassantVulnerable { get; private set; }
 
-        private readonly HashSet<Piece> _allPices;
+        private HashSet<Piece> _allPices;
         private HashSet<Piece> _capturedPieces;
 
         public ChessMatch()
@@ -83,52 +83,79 @@ namespace ChessConsole.ChessLayer
 
         public Piece ExecuteMove(Position origin, Position destination)
         {
-            Piece pieceOrigin = Board.RemovePiece(origin);
-            pieceOrigin.IncrementTotalMoves();
+            Piece piece = Board.RemovePiece(origin);
+            piece.IncrementTotalMoves();
             Piece capturedPiece = Board.RemovePiece(destination);
-            Board.PlacePiece(pieceOrigin, destination);
+            Board.PlacePiece(piece, destination);
 
             if (capturedPiece != null)
             {
                 _capturedPieces.Add(capturedPiece);
             }
 
-            #region execute special move Castling
-            // castling short 
-            if (IsCastlingShortMove(origin, destination, pieceOrigin))
+            #region special moves
+
+            if (IsCastlingShortMove(origin, destination, piece))
             {
-                ExecuteRookMoveCastlingShort(origin, destination, pieceOrigin);
+                ExecuteRookMoveCastlingShort(origin, destination, piece);
             }
 
-            // castling long
-            if (IsCastlingLongMove(origin, destination, pieceOrigin))
+            if (IsCastlingLongMove(origin, destination, piece))
             {
-                ExecuteRookMoveCastlingLong(origin, destination, pieceOrigin);
+                ExecuteRookMoveCastlingLong(origin, destination, piece);
             }
 
-            // en passant
-            if (pieceOrigin is Pawn)
+            if (IsEnPassantMove(origin, destination, piece, capturedPiece))
             {
-                if (origin.Column != destination.Column && capturedPiece == null)
-                {
-                    Position positionCapturedPawn;
-                    if (pieceOrigin.Color == Color.White)
-                    {
-                        positionCapturedPawn = new Position(destination.Row + 1, destination.Column);
-                    }
-                    else
-                    {
-                        positionCapturedPawn = new Position(destination.Row - 1, destination.Column);
-                    }
-                    capturedPiece = Board.RemovePiece(positionCapturedPawn);
-                    _capturedPieces.Add(capturedPiece);
-                }
+                capturedPiece = ExecuteEnPassantMove(destination, piece);
+            }
+
+            if (IsPromotionMove(destination, piece))
+            {
+                piece = ExecutePromotionMove(destination);
             }
             #endregion
 
             return capturedPiece;
         }
 
+        private Piece ExecuteEnPassantMove(Position destination, Piece pieceOrigin)
+        {
+            Piece capturedPiece;
+            Position positionCapturedPawn;
+            if (pieceOrigin.Color == Color.White)
+            {
+                positionCapturedPawn = new Position(destination.Row + 1, destination.Column);
+            }
+            else
+            {
+                positionCapturedPawn = new Position(destination.Row - 1, destination.Column);
+            }
+            capturedPiece = Board.RemovePiece(positionCapturedPawn);
+            _capturedPieces.Add(capturedPiece);
+            return capturedPiece;
+        }
+
+        private static bool IsEnPassantMove(Position origin, Position destination, Piece pieceOrigin, Piece capturedPiece)
+        {
+            return pieceOrigin is Pawn && origin.Column != destination.Column && capturedPiece == null;
+        }
+
+        private static bool IsPromotionMove(Position destination, Piece pieceOrigin)
+        {
+            return pieceOrigin is Pawn && (destination.Row == 0 || destination.Row == 7);
+        }
+
+        private Piece ExecutePromotionMove(Position destination)
+        {
+            Piece piece = Board.RemovePiece(destination);
+            _allPices.Remove(piece);
+            Piece queen = new Queen(Board, piece.Color);
+            Board.PlacePiece(queen, destination);
+            _allPices.Add(queen);
+
+            return queen;
+        }
 
         private void RestoreMove(Position origin, Position destination, Piece capturedPiece)
         {
@@ -142,7 +169,7 @@ namespace ChessConsole.ChessLayer
             }
             Board.PlacePiece(piece, origin);
 
-            #region Restore Special Move Castling
+            #region Restore Special Moves
 
             if (IsLastMoveShortCastling(piece, origin, destination))
             {
@@ -216,7 +243,7 @@ namespace ChessConsole.ChessLayer
         {
             Piece pawn = Board.RemovePiece(destination);
             Position pawnOriginPositionBeforeEnPassant;
-            if(piece.Color == Color.White)
+            if (piece.Color == Color.White)
             {
                 pawnOriginPositionBeforeEnPassant = new Position(3, destination.Column);
             }
@@ -256,7 +283,7 @@ namespace ChessConsole.ChessLayer
 
             if (Board.GetPiece(position) == null)
             {
-                throw new BoardException("Invalid origin position: there is no piece at the position!");
+                throw new BoardException("Invalid origin position: there is no piece at given position!");
             }
 
             if (ActualPlayer != Board.GetPiece(position).Color)
@@ -272,14 +299,9 @@ namespace ChessConsole.ChessLayer
 
         public void ValidateDestinationPosition(Position origin, Position destination)
         {
-            if (destination == null)
+            if (destination == null || !Board.GetPiece(origin).PossibleMove(destination))
             {
                 throw new BoardException("Invalid position.");
-            }
-
-            if (!Board.GetPiece(origin).PossibleMove(destination))
-            {
-                throw new BoardException("Invalid destination position.");
             }
         }
 

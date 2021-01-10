@@ -40,7 +40,7 @@ namespace ChessConsole.ChessLayer
             var possibleMovesMat = new bool[Board.Rows, Board.Columns];
             var position = new Position(0, 0);
 
-            int signal = -1;    // incremnent signal
+            int signal = -1;   
             if (base.Color == Color.Black)
             {
                 signal = +1;
